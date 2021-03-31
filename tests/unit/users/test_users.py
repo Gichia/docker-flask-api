@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from users.user import UserModel
+from app.models.users.user import UserModel
 
 
 class UserTest(TestCase):
@@ -54,8 +54,8 @@ class UserTest(TestCase):
                     password="@testpass123!")
 
         excepted = {
+            "id": None,
             "phone": "",
-            "user_id": None,
             "username": "testuser",
             "email": "jdoe@test.com",
         }

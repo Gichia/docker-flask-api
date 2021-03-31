@@ -14,10 +14,12 @@ Misc Variables
     None
 """
 
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Union
+
+from main import db
 
 
-class UserModel:
+class UserModel(db.Model):
     """
     A class to represent user methods
     ...
@@ -34,11 +36,18 @@ class UserModel:
             Returns the json representation of the user
     """
 
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone = db.Column(db.String(120), unique=False, nullable=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+
     def __init__(
         self,
         email: str,
         username: str,
-        user_id: int = None,
+        id: int = None,
         phone: Optional[str] = "",
         **kwargs
     ):
@@ -58,10 +67,10 @@ class UserModel:
                 Returns the json representation of the user
         """
 
+        self.id = id
         self.email = email
         self.phone = phone
         self._kwargs = kwargs
-        self.user_id = user_id
         self.username = username
 
         super(UserModel, self).__init__()
@@ -80,8 +89,35 @@ class UserModel:
         """
 
         return {
+            "id": self.id,
             "email": self.email,
             "phone": self.phone,
-            "user_id": self.user_id,
             "username": self.username,
         }
+
+    @classmethod
+    def find_by_username(
+        cls,
+        username: str
+    ) -> Union[List, None]:
+        """
+
+        """
+
+        return cls.query.filter_by(username=username).first()
+
+    def save_to_db(self):
+        """
+        
+        """
+
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        """
+        
+        """
+
+        db.session.delete(self)
+        db.session.commit()
