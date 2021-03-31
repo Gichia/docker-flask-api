@@ -2,13 +2,35 @@ version: "3.7"
    
 services:
 
+  db:
+    image: postgres:10
+    volumes:
+      - psql-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks: 
+      - backend
+
   web:
     build: .
-    command: flask run
+    command: flask run --host=0.0.0.0
     environment: 
       - DEBUG=True
       - FLASK_ENV=development
+      - DB_URI=postgresql://postgres:postgres@db/postgres
     volumes:
       - .:/app
     ports:
       - "5000:5000"
+    networks: 
+      - backend
+    depends_on:
+      - db
+
+volumes: 
+  psql-data:
+
+networks:
+  backend:

@@ -2,6 +2,17 @@ version: "3.3"
    
 services:
 
+  test_db:
+    image: postgres:10
+    volumes:
+      - psql-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks: 
+      - backend
+
   sut:
     build: .
     command: pytest
@@ -9,7 +20,14 @@ services:
       - DEBUG=True
       - TESTING=True 
       - FLASK_ENV=testing
-    volumes:
-      - .:/app
-    ports:
-      - "5000:5000"
+      - TEST_DB_URI=postgresql://postgres:postgres@test_db/postgres
+    networks: 
+      - backend
+    depends_on:
+      - test_db
+
+volumes: 
+  psql-data:
+
+networks:
+  backend:
